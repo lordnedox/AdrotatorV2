@@ -23,7 +23,21 @@ namespace AdRotator
     public sealed class AdRotatorControl : Control, IAdRotatorProvider, IDisposable
     {
         private int AdRotatorControlID;
-        private static FileHelpers fileHelper = new FileHelpers();
+
+        //MARCO Changed like this, XAML Designer throws errors if you instance FileHelpers in design mode
+        private static FileHelpers _fileHelper;
+        private static FileHelpers fileHelper
+        {
+            get
+            {
+                if (!DesignerProperties.IsInDesignTool)
+                {
+                    if (_fileHelper == null) _fileHelper = new FileHelpers();
+                    return _fileHelper;
+                }
+                return null;
+            }
+        }
         private AdRotatorComponent adRotatorControl = new AdRotatorComponent(CultureInfo.CurrentUICulture.ToString(), fileHelper);
 #if WINDOWS_PHONE
 #if WP7
@@ -46,9 +60,10 @@ namespace AdRotator
         }
         #endregion
 
-        public AdRotatorControl(): this(0)
-        {}
- 
+        public AdRotatorControl()
+            : this(0)
+        { }
+
         public AdRotatorControl(int id)
         {
             AdRotatorControlID = id;
@@ -74,7 +89,7 @@ namespace AdRotator
                     AdType.InnerActive,
 #endif
                 };
-            adRotatorControl.Log += (s) => OnLog(AdRotatorControlID,s);
+            adRotatorControl.Log += (s) => OnLog(AdRotatorControlID, s);
         }
 
         private Border AdRotatorRoot
@@ -148,7 +163,7 @@ namespace AdRotator
             {
                 OnLog(AdRotatorControlID, "Control is not enabled");
                 return "Control Disabled";
-            } 
+            }
             if (adProvider == null)
             {
                 adRotatorControl.GetAd(null);
@@ -173,7 +188,7 @@ namespace AdRotator
             {
                 if (adProvider.AdProviderType == AdType.DefaultHouseAd)
                 {
-                    var defaultHouseAd = new DefaultHouseAd(AdRotatorControlID,fileHelper);
+                    var defaultHouseAd = new DefaultHouseAd(AdRotatorControlID, fileHelper);
                     //houseAd.AdLoaded += (s, e) => adRotatorControl.OnAdAvailable(AdType.DefaultHouseAd);
                     defaultHouseAd.AdLoadingFailed += (s, e) => adRotatorControl.AdFailed(AdType.DefaultHouseAd);
                     defaultHouseAd.AdClicked += (s, e) => OnDefaultHouseAdClicked();
@@ -390,7 +405,7 @@ namespace AdRotator
         #region DefaultHouseAdBody
         public string DefaultHouseAdBody
         {
-            get { return (string)GetValue(DefaultHouseAdBodyProperty);}
+            get { return (string)GetValue(DefaultHouseAdBodyProperty); }
             set { SetValue(DefaultHouseAdBodyProperty, value); }
         }
 
@@ -404,7 +419,7 @@ namespace AdRotator
 
         public string DefaultHouseAdURI
         {
-            get { return (string)GetValue(DefaultHouseAdURIProperty);}
+            get { return (string)GetValue(DefaultHouseAdURIProperty); }
             set { SetValue(DefaultHouseAdURIProperty, value); }
         }
 
@@ -446,7 +461,7 @@ namespace AdRotator
         #endregion
 
         #region PlatformAdProviderComponents
-        public Dictionary<AdType,Type> PlatformAdProviderComponents
+        public Dictionary<AdType, Type> PlatformAdProviderComponents
         {
             get
             {

@@ -16,7 +16,7 @@ namespace AdRotator.Model
         internal AdCultureDescriptor CurrentCulture = null;
 
         internal AdType CurrentAdType = AdType.None;
-        
+
         private AdCultureDescriptor[] cultureDescriptorsField;
 
         /// <summary>
@@ -147,10 +147,11 @@ namespace AdRotator.Model
                 return new AdRotator.AdProviders.AdProviderNone();
             }
 
+            //MARCO Fixed parenthesis, with the last "OR" it made useless the first 2 conditions, and so it didn't check the adFailed array!
             var validDescriptors = adsettings.CurrentCulture.Items
             .Where(x => !adsettings._failedAdTypes.Contains(((AdProvider)x).AdProviderType)
                         && AdRotatorComponent.PlatformSupportedAdProviders.Contains(((AdProvider)x).AdProviderType)
-                        && (((AdProvider)x).Probability > 0) || ((AdProvider)x).AdOrder > 0).Cast<AdProvider>().ToArray();
+                        && ((((AdProvider)x).Probability > 0) || ((AdProvider)x).AdOrder > 0)).Cast<AdProvider>().ToArray();
 
             var defaultHouseAd = (AdProvider)adsettings.CurrentCulture.Items.FirstOrDefault(x => ((AdProvider)x).AdProviderType == AdType.DefaultHouseAd && !adsettings._failedAdTypes.Contains(AdType.DefaultHouseAd));
 
@@ -186,7 +187,7 @@ namespace AdRotator.Model
                         }
                         return adsettings.CurrentAdProvider;
                 }
-                
+
             }
 
             if (defaultHouseAd != null)
@@ -258,6 +259,6 @@ namespace AdRotator.Model
 
             return retArray;
         }
-        
+
     }
 }
